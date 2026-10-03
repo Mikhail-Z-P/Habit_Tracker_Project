@@ -112,10 +112,11 @@ jobs:
             \${{ secrets.DOCKER_HUB_USERNAME }}/habit_tracker:latest
 
   deploy:
-    needs: [build]
+    needs: [ build ]
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
+    if: github.event_name == 'pull_request' || github.event == 'push'
     steps:
+
       - name: Checkout code
         uses: actions/checkout@v4
 
