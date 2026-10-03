@@ -1,4 +1,4 @@
-name: CI/CD Pipeline
+name: CI/CD Pipeline — Max Trigger
 
 on:
   push:
@@ -15,6 +15,7 @@ concurrency:
 
 jobs:
   lint:
+    name: Lint & Format
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -25,15 +26,15 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install dependencies
+      - name: Install lint dependencies
         run: |
-          pip install flake8
-          pip install flake8-isort
+          pip install flake8 flake8-isort
 
       - name: Run flake8
         run: flake8 .
 
   test:
+    name: Unit & Integration Tests
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -68,7 +69,7 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Install dependencies
+      - name: Install test dependencies
         run: |
           pip install -r requirements.txt
           pip install coverage pytest pytest-django
@@ -93,6 +94,7 @@ jobs:
           coverage report
 
   build:
+    name: Build & Push Docker Image
     needs: [lint, test]
     runs-on: ubuntu-latest
     steps:
@@ -108,7 +110,7 @@ jobs:
           username: \${{ secrets.DOCKER_HUB_USERNAME }}
           password: \${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
 
-      - name: Build and push Docker image
+      - name: Build and push
         uses: docker/build-push-action@v5
         with:
           context: .
@@ -118,6 +120,7 @@ jobs:
             \${{ secrets.DOCKER_HUB_USERNAME }}/habit_tracker:latest
 
   deploy:
+    name: Deploy to Server
     needs: [build]
     runs-on: ubuntu-latest
     steps:
