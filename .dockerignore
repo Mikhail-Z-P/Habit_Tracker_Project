@@ -1,0 +1,13 @@
+.git
+.gitignore
+__pycache__
+*.pyc
+venv
+.venv
+.env
+*.md
+poetry.lock
+.coverage
+.cache
+pytest_cache
+htmlcov
