@@ -43,12 +43,20 @@ class HabitAPITest(TestCase):
     def test_list_own_habits(self):
         """Проверка что возвращаются только свои привычки."""
         Habit.objects.create(
-            user=self.user, place="Дом", time="08:00",
-            action="Читать", execution_time=30, reward="Чай",
+            user=self.user,
+            place="Дом",
+            time="08:00",
+            action="Читать",
+            execution_time=30,
+            reward="Чай",
         )
         Habit.objects.create(
-            user=self.other_user, place="Парк", time="09:00",
-            action="Бегать", execution_time=30, reward="Сок",
+            user=self.other_user,
+            place="Парк",
+            time="09:00",
+            action="Бегать",
+            execution_time=30,
+            reward="Сок",
         )
         url = "/api/habits/"
         response = self.client.get(url)
@@ -60,8 +68,12 @@ class HabitAPITest(TestCase):
     def test_update_own_habit(self):
         """Проверка обновления своей привычки."""
         habit = Habit.objects.create(
-            user=self.user, place="Дом", time="08:00",
-            action="Читать", execution_time=30, reward="Чай",
+            user=self.user,
+            place="Дом",
+            time="08:00",
+            action="Читать",
+            execution_time=30,
+            reward="Чай",
         )
         url = f"/api/habits/{habit.id}/"
         data = {"place": "Офис"}
@@ -73,8 +85,12 @@ class HabitAPITest(TestCase):
     def test_delete_own_habit(self):
         """Проверка удаления своей привычки."""
         habit = Habit.objects.create(
-            user=self.user, place="Дом", time="08:00",
-            action="Читать", execution_time=30, reward="Чай",
+            user=self.user,
+            place="Дом",
+            time="08:00",
+            action="Читать",
+            execution_time=30,
+            reward="Чай",
         )
         url = f"/api/habits/{habit.id}/"
         response = self.client.delete(url)
@@ -84,8 +100,12 @@ class HabitAPITest(TestCase):
     def test_cannot_access_other_user_habit(self):
         """Проверка запрета доступа к чужим привычкам."""
         habit = Habit.objects.create(
-            user=self.other_user, place="Парк", time="09:00",
-            action="Бегать", execution_time=30, reward="Сок",
+            user=self.other_user,
+            place="Парк",
+            time="09:00",
+            action="Бегать",
+            execution_time=30,
+            reward="Сок",
         )
         url = f"/api/habits/{habit.id}/"
         response = self.client.get(url)
@@ -94,13 +114,21 @@ class HabitAPITest(TestCase):
     def test_public_habits_list(self):
         """Проверка списка публичных привычек."""
         Habit.objects.create(
-            user=self.user, place="Парк", time="08:00",
-            action="Бегать", execution_time=30, reward="Сок",
+            user=self.user,
+            place="Парк",
+            time="08:00",
+            action="Бегать",
+            execution_time=30,
+            reward="Сок",
             is_public=True,
         )
         Habit.objects.create(
-            user=self.other_user, place="Дом", time="09:00",
-            action="Читать", execution_time=30, reward="Чай",
+            user=self.other_user,
+            place="Дом",
+            time="09:00",
+            action="Читать",
+            execution_time=30,
+            reward="Чай",
             is_public=False,
         )
         url = "/api/habits/public/"
@@ -113,8 +141,11 @@ class HabitAPITest(TestCase):
         """Проверка структуры пагинации (limit/offset/count/results)."""
         for i in range(7):
             Habit.objects.create(
-                user=self.user, place=f"Место {i}", time="08:00",
-                action=f"Действие {i}", execution_time=30,
+                user=self.user,
+                place=f"Место {i}",
+                time="08:00",
+                action=f"Действие {i}",
+                execution_time=30,
                 reward=f"Награда {i}",
             )
         url = "/api/habits/"
