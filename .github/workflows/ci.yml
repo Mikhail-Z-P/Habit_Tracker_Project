@@ -1,4 +1,4 @@
-name: Full CI/CD Pipeline — Trigger Guaranteed
+name: Full CI/CD Pipeline
 
 on:
   push:
@@ -14,28 +14,19 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-
   lint:
-    name: Lint & Format
+    name: Lint
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-
-      - name: Install lint dependencies
-        run: |
-          pip install flake8 flake8-isort
-
-      - name: Run flake8
-        run: flake8 .
+      - run: pip install flake8 flake8-isort
+      - run: flake8 .
 
   test:
-    name: Unit & Integration Tests
+    name: Tests
     runs-on: ubuntu-latest
     services:
       postgres:
@@ -60,22 +51,15 @@ jobs:
           --health-interval 10s
           --health-timeout 5s
           --health-retries 5
-
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Python
-        uses: actions/setup-python@v5
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-
-      - name: Install test dependencies
-        run: |
+      - run: |
           pip install -r requirements.txt
           pip install coverage pytest pytest-django
-
-      - name: Run tests with coverage
+      - name: Run tests
         env:
           DB_ENGINE: django.db.backends.postgresql
           DB_NAME: test_db
@@ -95,52 +79,36 @@ jobs:
           coverage report
 
   build:
-    name: Build & Push Docker Image
+    name: Build & Push
     needs: [lint, test]
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
       - name: Login to Docker Hub
-        uses: docker/login-action@v3
-        with:
-          username: \${{ secrets.DOCKER_HUB_USERNAME }}
-          password: \${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}
-
-      - name: Build and push
-        uses: docker/build-push-action@v5
+        run: echo '${{ secrets.DOCKER_HUB_ACCESS_TOKEN }}' | docker login -u '${{ secrets.DOCKER_HUB_USERNAME }}' --password-stdin
+      - uses: docker/build-push-action@v5
         with:
           context: .
           push: true
           tags: |
             ${{ secrets.DOCKER_HUB_USERNAME }}/habit_tracker:${{ github.sha }}
-            \${{ secrets.DOCKER_HUB_USERNAME }}/habit_tracker:latest
+            ${{ secrets.DOCKER_HUB_USERNAME }}/habit_tracker:latest
 
   deploy:
-    name: Deploy to Server
+    name: Deploy
     needs: [build]
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Setup SSH
-        uses: webfactory/ssh-agent@v0.9.0
+      - uses: actions/checkout@v4
+      - uses: webfactory/ssh-agent@v0.9.0
         with:
-          ssh-private-key: \${{ secrets.SSH_PRIVATE_KEY }}
-
-      - name: Add server to known hosts
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+      - name: Deploy
         run: |
-          ssh-keyscan -H \${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
-
-      - name: Deploy to server
-        run: |
+          ssh-keyscan -H ${{ secrets.SERVER_HOST }} >> ~/.ssh/known_hosts
           ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "
-            cd \${{ secrets.DEPLOY_DIR }} && \
+            cd ${{ secrets.DEPLOY_DIR }} && \
             git pull origin Develop && \
             chmod +x entrypoint.sh && \
             docker compose down && \
