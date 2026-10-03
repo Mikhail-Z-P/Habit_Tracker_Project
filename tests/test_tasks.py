@@ -37,12 +37,18 @@ class CeleryTaskTest(TestCase):
     def setUp(self):
         """Создаёт тестового пользователя и привычку."""
         self.user = User.objects.create_user(
-            username="taskuser", email="task@test.com",
-            password="taskpass123", telegram_chat_id="123456",
+            username="taskuser",
+            email="task@test.com",
+            password="taskpass123",
+            telegram_chat_id="123456",
         )
         self.habit = Habit.objects.create(
-            user=self.user, place="Парк", time="08:00",
-            action="Бегать", execution_time=30, reward="Сок",
+            user=self.user,
+            place="Парк",
+            time="08:00",
+            action="Бегать",
+            execution_time=30,
+            reward="Сок",
         )
 
     def test_reminder_existing_habit(self):

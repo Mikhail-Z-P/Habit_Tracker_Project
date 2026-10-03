@@ -12,6 +12,8 @@ class HabitListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         """Возвращает только привычки текущего пользователя."""
+        if getattr(self, "swagger_fake_view", False) or self.request.user.is_anonymous:
+            return Habit.objects.none()
         return Habit.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
@@ -27,6 +29,8 @@ class HabitDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         """Возвращает привычки текущего пользователя."""
+        if getattr(self, "swagger_fake_view", False) or self.request.user.is_anonymous:
+            return Habit.objects.none()
         return Habit.objects.filter(user=self.request.user)
 
 

@@ -12,7 +12,9 @@ class ValidatorTest(TestCase):
     def setUp(self):
         """Создаёт тестового пользователя."""
         self.user = User.objects.create_user(
-            username="valuser", email="val@test.com", password="valpass123",
+            username="valuser",
+            email="val@test.com",
+            password="valpass123",
         )
 
     def test_execution_time_valid(self):
@@ -36,19 +38,31 @@ class ValidatorTest(TestCase):
     def test_habit_with_linked_only(self):
         """Проверка привычки только со связанной привычкой."""
         pleasant = Habit.objects.create(
-            user=self.user, place="Дом", time="08:00",
-            action="Ванна", is_pleasant=True, execution_time=60,
+            user=self.user,
+            place="Дом",
+            time="08:00",
+            action="Ванна",
+            is_pleasant=True,
+            execution_time=60,
         )
         habit = Habit(
-            user=self.user, place="Дом", time="09:00",
-            action="Гулять", linked_habit=pleasant, execution_time=30,
+            user=self.user,
+            place="Дом",
+            time="09:00",
+            action="Гулять",
+            linked_habit=pleasant,
+            execution_time=30,
         )
         habit.clean()
 
     def test_habit_with_reward_only(self):
         """Проверка привычки только с вознаграждением."""
         habit = Habit(
-            user=self.user, place="Дом", time="09:00",
-            action="Гулять", reward="Сок", execution_time=30,
+            user=self.user,
+            place="Дом",
+            time="09:00",
+            action="Гулять",
+            reward="Сок",
+            execution_time=30,
         )
         habit.clean()

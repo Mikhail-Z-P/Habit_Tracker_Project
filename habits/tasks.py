@@ -23,10 +23,7 @@ def send_habit_reminder(habit_id):
         logger.warning("У пользователя %s нет Telegram chat ID", habit.user.username)
         return
 
-    message = (
-        f"Напоминаю: я буду {habit.action} "
-        f"в {habit.time} в {habit.place}"
-    )
+    message = f"Напоминаю: я буду {habit.action} " f"в {habit.time} в {habit.place}"
     send_telegram_message(chat_id, message)
 
 
