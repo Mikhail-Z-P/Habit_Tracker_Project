@@ -111,6 +111,8 @@ jobs:
             ${{ secrets.DOCKER_HUB_USERNAME }}/habit_tracker:latest
 
   deploy:
+
+
     needs: [build]
     runs-on: ubuntu-latest
     if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
@@ -132,6 +134,8 @@ jobs:
           ssh ${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }} "
             cd ${{ secrets.DEPLOY_DIR }} && \
             git pull origin develop && \
+            chmod +x entrypoint.sh && \
             docker compose down && \
             docker compose up -d --build
           "
+     
