@@ -1,4 +1,5 @@
 #!/bin/sh
+set -e
 
 echo "Применение миграций..."
 python manage.py migrate --noinput

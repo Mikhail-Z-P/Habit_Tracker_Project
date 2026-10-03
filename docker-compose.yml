@@ -1,20 +1,19 @@
-version: "3.9"
-
 services:
   db:
-    image: postgres:15
+    image: postgres:16
     environment:
-      POSTGRES_DB: ${DB_NAME}
-      POSTGRES_USER: ${DB_USER}
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: habit_tracker
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     ports:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     restart: always
 
+
   redis:
-    image: redis:7-alpine
+    image: redis:7
     ports:
       - "6379:6379"
     restart: always
@@ -26,8 +25,8 @@ services:
     volumes:
       - .:/app
       - static_volume:/app/static
-    ports:
-      - "8000:8000"
+    expose:
+      - "8000"
     depends_on:
       - db
       - redis
@@ -58,12 +57,12 @@ services:
     restart: always
 
   nginx:
-    image: nginx:1.25-alpine
+    image: nginx:1.25
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
       - static_volume:/app/static
     ports:
-      - "80:80"
+      - "8080:80"
     depends_on:
       - web
     restart: always
